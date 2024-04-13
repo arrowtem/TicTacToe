@@ -3,7 +3,7 @@
 #
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (TicTacToe "main.cpp"  "TicTacToe/TicTacToe.h" "TicTacToe/TicTacToe.cpp")
+add_executable (TicTacToe "main.cpp"  "TicTacToe/TicTacToe.h" "TicTacToe/TicTacToe.cpp" "Player/Player.h" "Player/RandomPlayer.h" "Player/RandomPlayer.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TicTacToe PROPERTY CXX_STANDARD 20)
