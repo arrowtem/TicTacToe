@@ -1,7 +1,6 @@
 ﻿#include "Player/randomplayer.h"
 #include "Player/smartplayer.h"
 #include "GameManager/GameManager.h"
-#include <iostream>
 
 int main() {
     auto player1 = std::make_shared<RandomPlayer>(Cell::X);

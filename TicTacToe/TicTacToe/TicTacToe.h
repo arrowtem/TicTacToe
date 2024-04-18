@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <concepts>
 
 enum class Cell { Empty, X, O };
 

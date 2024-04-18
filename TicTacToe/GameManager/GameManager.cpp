@@ -1,9 +1,8 @@
 #include "gamemanager.h"
-#include <fstream>
 #include <iostream>
 #include <chrono>
-#include <thread>
 #include <random>
+
 GameManager::GameManager(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2)
     : player1(player1), player2(player2), player1Wins(0), player2Wins(0), draws(0) {}
 

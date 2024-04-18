@@ -2,7 +2,6 @@
 
 #include "Player.h"
 #include "../TicTacToe/TicTacToe.h"
-#include <limits>
 
 class SmartPlayer : public Player {
 public:
