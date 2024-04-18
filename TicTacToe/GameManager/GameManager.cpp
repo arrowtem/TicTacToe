@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <random>
-
+#include <fstream>
 GameManager::GameManager(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2)
     : player1(player1), player2(player2), player1Wins(0), player2Wins(0), draws(0) {}
 
@@ -21,14 +21,21 @@ double GameManager::getPlayer2WinPercentage() const {
     return static_cast<double>(player2Wins) / totalGamesPlayed * 100;
 }
 
-
 void GameManager::printGameStats() const {
     std::cout << "Total games played: " << totalGamesPlayed << std::endl;
     std::cout << "Player 1 wins: " << player1Wins << " (" << getPlayer1WinPercentage() << "%)\n";
     std::cout << "Player 2 wins: " << player2Wins << " (" << getPlayer2WinPercentage() << "%)\n";
     std::cout << "Draws: " << draws << " (" << 100 - (getPlayer1WinPercentage() + getPlayer2WinPercentage()) << "%)\n";
-}
 
+    std::ofstream logfile("game_log.csv", std::ios::app);
+
+    logfile << "Total games played," << totalGamesPlayed << std::endl;
+    logfile << "Player 1 wins," << player1Wins << "," << getPlayer1WinPercentage() << "%" << std::endl;
+    logfile << "Player 2 wins," << player2Wins << "," << getPlayer2WinPercentage() << "%" << std::endl;
+    logfile << "Draws," << draws << "," << 100 - (getPlayer1WinPercentage() + getPlayer2WinPercentage()) << "%" << std::endl;
+
+    logfile.close();
+}
 
 void GameManager::playSingleGame() {
     static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
@@ -36,17 +43,34 @@ void GameManager::playSingleGame() {
 
     bool player1Turn = distribution(rng) == 0;
 
+    std::ofstream logfile("game_log.csv", std::ios::app);
+
+    logfile << "Game Number,Player Type,Move Type,Row,Column,Mark" << std::endl;
+
     while (game.checkWinner() == Cell::Empty && !game.checkDraw()) {
         std::pair<int, int> move;
         Cell currentMark;
+        std::string currentPlayerType;
+        std::string moveType;
+
         if (player1Turn) {
             move = player1->makeMove(game);
             currentMark = player1->getMark();
+            currentPlayerType = player1->getTypeOfPlayer();
+            moveType = "First Player Move";
         }
         else {
             move = player2->makeMove(game);
             currentMark = player2->getMark();
+            currentPlayerType = player2->getTypeOfPlayer();
+            moveType = "Second Player Move";
         }
+
+        logfile << totalGamesPlayed + 1 << ",";
+        logfile << currentPlayerType << ",";
+        logfile << moveType << ",";
+        logfile << move.first << "," << move.second << ",";
+        logfile << (currentMark == Cell::X ? "X" : "O") << std::endl;
 
         if (!game.makeMove(move.first, move.second, currentMark))
             break;
@@ -58,20 +82,22 @@ void GameManager::playSingleGame() {
     if (winner == player1->getMark()) {
         ++player1Wins;
         std::cout << "Game " << totalGamesPlayed + 1 << ": Player 1 wins!\n";
+        logfile << totalGamesPlayed + 1 << ",Winner," << player1->getTypeOfPlayer() << std::endl;
     }
     else if (winner == player2->getMark()) {
         ++player2Wins;
         std::cout << "Game " << totalGamesPlayed + 1 << ": Player 2 wins!\n";
+        logfile << totalGamesPlayed + 1 << ",Winner," << player2->getTypeOfPlayer() << std::endl;
     }
     else {
         ++draws;
         std::cout << "Game " << totalGamesPlayed + 1 << ": Draw!\n";
+        logfile << totalGamesPlayed + 1 << ",Winner,Draw" << std::endl;
     }
 
+    logfile.close();
     game.reset();
 }
-
-
 
 void GameManager::printBoard() const {
     std::cout << "Current Game Board:\n";
